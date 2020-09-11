@@ -1,50 +1,66 @@
 <?php
+//____________________________________________________________
+//**************************INIT******************************
+//____________________________________________________________
+
 
 declare(strict_types=1);
 
-//settime time zone
+//Set time zone
 date_default_timezone_set("Europe/Brussels");
 
-//Accesin the cookies
+//Accesing the cookies
+$acumulatedOrder=isset($_COOKIE['acumulatedOrder']) ? floatval($_COOKIE['acumulatedOrder']) : 0;
 
-//we are going to use session variables so we need to enable sessions
+//Init session
 SESSION_START();
-//Variables
+
+//____________________________________________________________
+//***********************VARIABLES****************************
+//____________________________________________________________
+
+//Getting info from the SESSION
 $addressStreet=(!empty($_SESSION["s_addressStreet"])) ? $_SESSION["s_addressStreet"] : "";
 $streetNumber=(!empty($_SESSION["s_streetNumber"])) ? $_SESSION["s_streetNumber"] : "";
 $city=(!empty($_SESSION["s_city"])) ? $_SESSION["s_city"]:"";
 $zipCode=(!empty($_SESSION["s_zipCode"])) ? $_SESSION["s_zipCode"] : "";
 
-
 $email= "";
 $selectedProducts=[];
 $userMessage="";
-// $errMessage="";
-$totalValue = 0;
-
+$totalOrder="";
  
-//gettin the options to order food=1 : order food,  food=0: order drinks
+//Gettind the options to order food=1 : order food,  food=0: order drinks
 $food=(isset($_GET["food"])) ? $_GET["food"] : "1";
 
-//your products with their price.
+//Selecting which products are displayed
+//Drinks or Foods
 if ($food == '1'){
-$products = [
-  ['name' => 'Club Ham', 'price' => 3.20],
-  ['name' => 'Club Cheese', 'price' => 3],
-  ['name' => 'Club Cheese & Ham', 'price' => 4],
-  ['name' => 'Club Chicken', 'price' => 4],
-  ['name' => 'Club Salmon', 'price' => 5] 
-];
-}else{  
-  $products = [
-    ['name' => 'Cola', 'price' => 2],
-    ['name' => 'Fanta', 'price' => 2],
-    ['name' => 'Sprite', 'price' => 2],
-    ['name' => 'Ice-tea', 'price' => 3],
-];
+    $products = [
+      ['name' => 'Club Ham', 'price' => 3.20],
+      ['name' => 'Club Cheese', 'price' => 3],
+      ['name' => 'Club Cheese & Ham', 'price' => 4],
+      ['name' => 'Club Chicken', 'price' => 4],
+      ['name' => 'Club Salmon', 'price' => 5] 
+    ];
+    }else{  
+      $products = [
+        ['name' => 'Cola', 'price' => 2],
+        ['name' => 'Fanta', 'price' => 2],
+        ['name' => 'Sprite', 'price' => 2],
+        ['name' => 'Ice-tea', 'price' => 3],
+    ];
+
 
 }
+//____________________________________________________________
+//***********************FUNCTIONS****************************
+//____________________________________________________________
 
+//-----------------------------------------------------------------------------
+// NAME: cleanInput
+// FUNCTION: clean the data typed
+//-----------------------------------------------------------------------------
 function cleanInput($data){
     $data=trim($data);
     $data=stripslashes($data);
@@ -52,9 +68,14 @@ function cleanInput($data){
     return $data;
 };
 
-function validateData():bool{
+//-----------------------------------------------------------------------------
+// NAME: validateData
+// FUNCTION:Validate the data Entry
+//-----------------------------------------------------------------------------
+function validateData(){
     
-    global $userMessage,$email,$addressStreet,$streetNumber,$city,$zipCode,$selectedProducts,$products; // TODO: fix dirty code    
+    global $userMessage,$email,$addressStreet,$streetNumber,$city,$zipCode,$selectedProducts,$products; 
+    // TODO: fix dirty code    
 
     $errMessage="";
     //Validate e-mail 
@@ -126,10 +147,14 @@ function validateData():bool{
    } else{
      return true;
    }
- };
+ }
  
 
-//function : calculateDeliveryTime
+
+ //-----------------------------------------------------------------------------
+ // NAME: calculateDeliveryTime
+// FUNCTION: Calculate the delivery Time
+//-----------------------------------------------------------------------------
 function calculateDeliveryTime($delivery){  
   
   $hourDelivery=new DateTime();     
@@ -140,14 +165,19 @@ function calculateDeliveryTime($delivery){
   else{
     $hourDelivery->modify('+45 minute');
   }  
-   $hourDelivery=date("D M j H:m");
+  
+  $hourDelivery = $hourDelivery->format('Y-m-d H:i:s');
   
   return " <div class='alert alert-dismissible alert-info'>     
   <h4 class='alert-heading'>Congratulations - Order Recived !</h4> 
-  <p class='mb-0'> Your order will be delivered you at:<strong> $hourDelivery </strong>
+  <p class='mb-0'> Your order will be delivered at:<strong> $hourDelivery </strong>
   </p> </div>";
 }
 
+//-----------------------------------------------------------------------------
+// NAME: totalOrder
+// FUNCTION: sumarize the amount of order
+//-----------------------------------------------------------------------------
 function totalOrder($selectedProducts,$products){
   $totalOrder=0.0;
   foreach ($selectedProducts as $key => $selected) {
@@ -158,9 +188,13 @@ function totalOrder($selectedProducts,$products){
     }  
     
   }
-  return ($totalOrder==0) ? "" : "<h4> Total Order <strong>&euro; $totalOrder</strong></h4>";
+  return $totalOrder;
 }
 
+//-----------------------------------------------------------------------------
+// NAME: sendEmail
+// FUNCTION: send the email, using the input that the user typed
+//-----------------------------------------------------------------------------
 function sendEmail($email){
      $header="From:The Personal Ham Processors";
      $message="Dear Consumer: \n\n your order will be delivered soon.\n\n\nSincerely : The Staff";
@@ -179,9 +213,9 @@ function sendEmail($email){
 // }
 
 
-// whatIsHappening(); 
+// Main execution
+
 if ($_SERVER["REQUEST_METHOD"]=="POST"){    
-  // whatIsHappening(); 
   if(validateData()){    
       //Saving in session variables
       $_SESSION["s_addressStreet"]=$addressStreet;
@@ -189,12 +223,22 @@ if ($_SERVER["REQUEST_METHOD"]=="POST"){
       $_SESSION["s_city"]=$city;
       $_SESSION["s_zipCode"]=$zipCode;
       
+      //Calculating the delivery time
       $userMessage=calculateDeliveryTime($_POST["delivery"]);     
+
+      //Calculating the total of the order
       $totalOrder=totalOrder($selectedProducts,$products);
-      sendEmail($email);
+      
+      if ($totalOrder > 0){
+         $acumulatedOrder +=$totalOrder;
+         setcookie('acumulatedOrder',strval($acumulatedOrder),time() + (60*60*24*90),'/','becode.io');
+         $totalOrder=number_format($totalOrder,2);
+         $totalOrder="<h4> Total Order <strong>&euro; $totalOrder </strong></h4>";
+      }
+      //Sending the email
+       sendEmail($email);      
     };
-    //  var_dump($_POST);
+    
 };
 
-// whatIsHappening();
 require 'orderForm.php';

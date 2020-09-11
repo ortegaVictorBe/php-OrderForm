@@ -36,7 +36,8 @@
             <div class=" form-row">
                 <div class="form-group col-md-6">
                     <label for="email">E-mail:</label>
-                    <input type="text" id="email" name="email" class="form-control" value="<?php echo $email;?>" />
+                    <input type="text" id="email" name="email" class="form-control"
+                        value="<?php echo htmlspecialchars($email);?>" />
                 </div>
                 <div></div>
             </div>
@@ -46,23 +47,24 @@
                     <div class="form-group col-md-6">
                         <label for="street">Street:</label>
                         <input type="text" name="street" id="street" class="form-control"
-                            value="<?php echo $addressStreet;?>">
+                            value="<?php echo htmlspecialchars($addressStreet);?>">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="streetnumber">Street number:</label>
                         <input type="text" id="streetnumber" name="streetnumber" class="form-control"
-                            value="<?php echo $streetNumber;?>">
+                            value="<?php echo htmlspecialchars($streetNumber);?>">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="city">City:</label>
-                        <input type="text" id="city" name="city" class="form-control" value="<?php echo $city;?>">
+                        <input type="text" id="city" name="city" class="form-control"
+                            value="<?php echo htmlspecialchars($city);?>">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="zipcode">Zipcode</label>
                         <input type="text" id="zipcode" name="zipcode" class="form-control"
-                            value="<?php echo $zipCode;?>">
+                            value="<?php echo htmlspecialchars($zipCode);?>">
                     </div>
                 </div>
             </fieldset>
@@ -109,7 +111,7 @@
                 </div>
         </form>
 
-        <footer>You already ordered <strong>&euro; <?php echo $totalValue ?></strong> in food
+        <footer>You already ordered <strong>&euro; <?php echo number_format($acumulatedOrder,2) ?></strong> in food
             and
             drinks.</footer>
 
