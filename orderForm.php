@@ -19,9 +19,9 @@
 
 <body>
     <div class="container jumbotron">
-        <h1 class="text-center">Order food in restaurant <i class="fas fa-utensils"></i> <br /> "the Personal Ham
+        <h1 class="text-center">Order food in restaurant <i class="fas fa-utensils"></i> <br /> "The Personal Ham
             Processors"</h1>
-        <nav>
+        <nav class="mb-3 mt-3">
             <ul class="nav nav-pills">
                 <li class="nav-item">
                     <a class="nav-link active" href="?food=1">Order food</a>
@@ -31,7 +31,7 @@
                 </li>
             </ul>
         </nav>
-        <?php echo $errMessage ?>
+        <?php echo $userMessage;?>
         <form method="post" action="">
             <div class=" form-row">
                 <div class="form-group col-md-6">
@@ -81,7 +81,7 @@
                 </div>
                 <div class="form-group col-md-6">
                     <fieldset>
-                        <div class="card text-white bg-info mb-3 float-right" style="max-width: 20rem;">
+                        <div class="card -border-primary mb-3 float-right" style="max-width: 20rem;">
                             <div class="card-header">Delivery Options</div>
                             <div class="card-body">
                                 <p class="card-text">
@@ -98,6 +98,7 @@
                                         mins.)</label>
                                 </div>
                                 </p>
+                                <?php echo $totalOrder; ?>
                             </div>
                     </fieldset>
                 </div>
