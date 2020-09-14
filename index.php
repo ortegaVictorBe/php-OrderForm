@@ -2,23 +2,18 @@
 //____________________________________________________________
 //**************************INIT******************************
 //____________________________________________________________
-
-
 declare(strict_types=1);
+//Init session
+SESSION_START();
 
 //Set time zone
 date_default_timezone_set("Europe/Brussels");
 
 //Accesing the cookies
 $acumulatedOrder=isset($_COOKIE['acumulatedOrder']) ? floatval($_COOKIE['acumulatedOrder']) : 0;
-
-//Init session
-SESSION_START();
-
 //____________________________________________________________
 //***********************VARIABLES****************************
 //____________________________________________________________
-
 //Getting info from the SESSION
 $addressStreet=(!empty($_SESSION["s_addressStreet"])) ? $_SESSION["s_addressStreet"] : "";
 $streetNumber=(!empty($_SESSION["s_streetNumber"])) ? $_SESSION["s_streetNumber"] : "";
@@ -50,8 +45,6 @@ if ($food == '1'){
         ['name' => 'Sprite', 'price' => 2],
         ['name' => 'Ice-tea', 'price' => 3],
     ];
-
-
 }
 //____________________________________________________________
 //***********************FUNCTIONS****************************
@@ -196,10 +189,12 @@ function totalOrder($selectedProducts,$products){
 // FUNCTION: send the email, using the input that the user typed
 //-----------------------------------------------------------------------------
 function sendEmail($email){
-     $header="From:The Personal Ham Processors";
-     $message="Dear Consumer: \n\n your order will be delivered soon.\n\n\nSincerely : The Staff";
+    
+  
+     $headers .= "From: VictorOrtega". "\r\n";    
+     $message="Dear Consumer: \n\n Su orden esta lista!.\n\n\nSincerely : The Staff";
      $subject="Order Recived";
-     mail($email,$subject,$message,$header);
+     mail($email,$subject,$message,$headers);
 }
  // function whatIsHappening() {
 //     echo '<h2>$_GET</h2>';
