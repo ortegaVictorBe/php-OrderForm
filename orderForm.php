@@ -111,17 +111,13 @@
                 </div>
         </form>
 
-        <footer>You already ordered <strong>&euro; <?php echo number_format($acumulatedOrder,2) ?></strong> in food
+    </div>
+    <div class="jumbotron">
+        <footer class="mt-5 text-center">You already ordered <strong>&euro;
+                <?php echo number_format($acumulatedOrder,2) ?></strong> in food
             and
             drinks.</footer>
-
     </div>
-
-    <style>
-    footer {
-        text-align: center;
-    }
-    </style>
 </body>
 
 </html>
